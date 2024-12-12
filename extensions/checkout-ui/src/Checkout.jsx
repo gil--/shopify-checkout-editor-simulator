@@ -1,13 +1,12 @@
 import {
   reactExtension,
   Banner,
-  BlockStack,
-  Checkbox,
-  Text,
   useApi,
   useApplyAttributeChange,
   useInstructions,
   useTranslate,
+  Modal,
+  Link,
 } from "@shopify/ui-extensions-react/checkout";
 
 // 1. Choose an extension target
@@ -35,16 +34,16 @@ function Extension() {
 
   // 3. Render a UI
   return (
-    <BlockStack border={"dotted"} padding={"tight"}>
-      <Banner title="checkout-ui">
-        {translate("welcome", {
-          target: <Text emphasis="italic">{extension.target}</Text>,
-        })}
-      </Banner>
-      <Checkbox onChange={onCheckboxChange}>
-        {translate("iWouldLikeAFreeGiftWithMyOrder")}
-      </Checkbox>
-    </BlockStack>
+    <Link
+      overlay={
+        <Modal
+          id="my-modal"
+          padding
+          title="Return policy"
+        >
+        </Modal>
+      }
+    >Open simulator</Link>    
   );
 
   async function onCheckboxChange(isChecked) {
