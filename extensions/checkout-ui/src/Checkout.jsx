@@ -1,58 +1,54 @@
 import {
-  reactExtension,
-  Banner,
-  useApi,
-  useApplyAttributeChange,
-  useInstructions,
-  useTranslate,
-  Modal,
-  Link,
+    reactExtension,
+    Banner,
+    useApi,
+    useApplyAttributeChange,
+    useInstructions,
+    useTranslate,
+    Modal,
+    Link,
 } from "@shopify/ui-extensions-react/checkout";
 
 // 1. Choose an extension target
 export default reactExtension("purchase.checkout.header.render-after", () => (
-  <Extension />
+    <Extension />
 ));
 
 function Extension() {
-  const translate = useTranslate();
-  const { extension } = useApi();
-  const instructions = useInstructions();
-  const applyAttributeChange = useApplyAttributeChange();
+    const translate = useTranslate();
+    const { extension } = useApi();
+    const instructions = useInstructions();
+    const applyAttributeChange = useApplyAttributeChange();
 
+    // 2. Check instructions for feature availability, see https://shopify.dev/docs/api/checkout-ui-extensions/apis/cart-instructions for details
+    if (!instructions.attributes.canUpdateAttributes) {
+        // For checkouts such as draft order invoices, cart attributes may not be allowed
+        // Consider rendering a fallback UI or nothing at all, if the feature is unavailable
+        return (
+            <Banner title="checkout-ui" status="warning">
+                {translate("attributeChangesAreNotSupported")}
+            </Banner>
+        );
+    }
 
-  // 2. Check instructions for feature availability, see https://shopify.dev/docs/api/checkout-ui-extensions/apis/cart-instructions for details
-  if (!instructions.attributes.canUpdateAttributes) {
-    // For checkouts such as draft order invoices, cart attributes may not be allowed
-    // Consider rendering a fallback UI or nothing at all, if the feature is unavailable
+    // 3. Render a UI
     return (
-      <Banner title="checkout-ui" status="warning">
-        {translate("attributeChangesAreNotSupported")}
-      </Banner>
-    );
-  }
-
-  // 3. Render a UI
-  return (
-    <Link
-      overlay={
-        <Modal
-          id="my-modal"
-          padding
-          title="Return policy"
+        <Link
+            overlay={
+                <Modal id="my-modal" padding title="Return policy"></Modal>
+            }
         >
-        </Modal>
-      }
-    >Open simulator</Link>    
-  );
+            Open simulator
+        </Link>
+    );
 
-  async function onCheckboxChange(isChecked) {
-    // 4. Call the API to modify checkout
-    const result = await applyAttributeChange({
-      key: "requestedFreeGift",
-      type: "updateAttribute",
-      value: isChecked ? "yes" : "no",
-    });
-    console.log("applyAttributeChange result", result);
-  }
+    async function onCheckboxChange(isChecked) {
+        // 4. Call the API to modify checkout
+        const result = await applyAttributeChange({
+            key: "requestedFreeGift",
+            type: "updateAttribute",
+            value: isChecked ? "yes" : "no",
+        });
+        console.log("applyAttributeChange result", result);
+    }
 }
